@@ -9,6 +9,7 @@
     <title>Convert Wireshark to Excel</title>
 </head>
 
+
 <body>
 
     <h1>Convert Wireshark to Excel</h1>
@@ -93,18 +94,19 @@
     function switchTable(x) {
         ws_dataTable.forEach(table => {
             if (table[1] == x) {
-
-                document.getElementById('myTable').innerHTML = table[0]
             }
+            document.getElementById('myTable').innerHTML = table[0]
+        }
         });
-        $(document).ready(function () {
-            $("td:contains(true)").css("background-color", "#c1f5c1");
-        });
-        $(document).ready(function () {
-            $("td:contains(false)").css("background-color", "#f5c4c4");
-        });
+    $(document).ready(function () {
+        $("td:contains(true)").css("background-color", "#c1f5c1");
+    });
+    $(document).ready(function () {
+        $("td:contains(false)").css("background-color", "#f5c4c4");
+    });
 
     }
+
 
 
     stationNames = ["Slussen", "Gamla stan", "T-Centralen", "Hötorget", "Rådmansgatan", "Odenplan", "S:t Eriksplan",
@@ -302,6 +304,8 @@
         x.shift()
         return x
     }
+
+
 
     // ------ get data from file --------------
 
