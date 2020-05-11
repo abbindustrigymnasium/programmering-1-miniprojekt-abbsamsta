@@ -22,3 +22,6 @@ På bilden syns det hur "Distance to next station" börjar minska efter att "Doo
 ![loaded-marked](imgs/loaded-marked.png)
 
 Med detta program blev ca 6000, så kallade consister, till 1000 rader i 9 olika tabbeler varav tåget 2501 innehåller en stor majoritet av raderna.
+
+
+![example](imgs/example.png)
