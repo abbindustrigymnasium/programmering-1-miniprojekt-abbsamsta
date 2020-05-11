@@ -19,7 +19,7 @@
             Test file test.pdml</a></p>
     <p>Choose PDML file</p>
     <input type="file" id="wsFile" name="wsFile"><br>
-    <button id="button-save">Save XLSX file</button>
+    <button id="button-save" disabled>Save XLSX file</button>
 
     <br>
     <p id="statusCheck"></p>
@@ -35,14 +35,15 @@
 
 </body>
 <script>
-    var ws_dataTable = []
+    // skapandet av tabellen
+    var ws_dataTable = [] // definerar tabellen
 
-    function CreateTable() {
-        for (var t = 0; t < ws_data.length; t++) {
+    function CreateTable() { // funktion för att sammanfatta tabellen
+        for (var t = 0; t < ws_data.length; t++) { // För varje tåg ska en tabell skapas
 
             var myTable = '<table style="width:100%" id="' + CstLabelList[t] + '"'
-            myTable += '<thead><tr>';
-            myTable +=
+            // Skriver ut huvudet i tabllen
+            myTable += '<thead><tr>' +
                 '<th>Frame Number</th>' +
                 '<th>Frame Arrival</th>' +
                 '<th>CstLabel</th>' +
@@ -59,13 +60,15 @@
                 '<th>Doors Closed </th>' +
                 '<th>Has Changed </th>' +
                 '<th>Last Updated </th>' +
-                '<th>Max Number Of Streams </th>'
-            myTable += '</tr></thead>';
-            myTable += '<tbody>'
-            for (var r = 0; r < ws_data[t].length; r++) {
+                '<th>Max Number Of Streams </th>' +
+                '</tr></thead>' +
+                '<tbody>'
+            
+            
+            for (var r = 0; r < ws_data[t].length; r++) { // För varje uppdering ska en rad skapas
                 myTable += '<tr>';
 
-                for (var c = 0; c < ws_data[t][r].length; c++) {
+                for (var c = 0; c < ws_data[t][r].length; c++) { // För varje information ska en column fyllas i
                     myTable += '<td>' + ws_data[t][r][c] + '</td>';
                 }
                 myTable += '</tr>';
@@ -73,12 +76,12 @@
             myTable += '</tbody></table>'
 
             ws_dataTable.push([myTable, CstLabelList[t]])
-            console.log(ws_dataTable)
+            // console.log(ws_dataTable)
 
         }
         tableSel = '<ul id="tableSelectBox">'
-        ws_dataTable.forEach(table => {
-            if (table[1] != "undefined") {
+        ws_dataTable.forEach(table => { // Varje tbbell ska ha en knapp för aktivering
+            if (table[1] != "undefined") { // Är tabellen "underdefined" ska inte knappen funka
 
                 tableSel += '<li><a id="' + table[1] + '"' + 'onclick="switchTable(' + table[1] + ')"' + '>' +
                     table[1] + '</a></li>'
@@ -91,24 +94,28 @@
 
     }
 
-    function switchTable(x) {
+    function switchTable(x) { // Byta av tabell som visas
         ws_dataTable.forEach(table => {
             if (table[1] == x) {
-            }
+                
             document.getElementById('myTable').innerHTML = table[0]
-        }
+            }
+        // }
         });
+    
+    // Färgläggning av tabell
     $(document).ready(function () {
-        $("td:contains(true)").css("background-color", "#c1f5c1");
+        $("td:contains(true)").css("background-color", "#c1f5c1"); // Rutor som innehåller "true" blir gröna
     });
     $(document).ready(function () {
-        $("td:contains(false)").css("background-color", "#f5c4c4");
+        $("td:contains(false)").css("background-color", "#f5c4c4"); // "false" blir rött
     });
 
     }
 
 
-
+    // Lista på alla stationer
+    // Korresponderande namm och lista har samma index
     stationNames = ["Slussen", "Gamla stan", "T-Centralen", "Hötorget", "Rådmansgatan", "Odenplan", "S:t Eriksplan",
         "Fridhemsplan", "Thorildsplan", "Kristineberg", "Alvik", "Stora mossen", "Abrahamsberg", "Brommaplan",
         "Åkeshov", "Ängbyplan", "Islandstorget", "Blackeberg", "Råcksta", "Vällingby", "Johannelund",
@@ -135,6 +142,7 @@
         "3241", "3251", "3261", "3271", "3411", "3421", "3431", "3441", "3451", "3461", "3471", "3481"
     ]
 
+    // Definerar listor av data 
     var wsFile = document.getElementById('wsFile');
     var ws_data = [
         [],
@@ -156,8 +164,8 @@
     var CstLabelList = []
 
 
-    // ------ get infos funktioner --------------
-    function GetStationName(x) {
+    // Funktioner för olika kollumner
+    function GetStationName(x) { // Hämtar namnet för tågen genom dess id
         stationID = x.substring(x.length - 4)
         x = ""
 
@@ -307,7 +315,7 @@
 
 
 
-    // ------ get data from file --------------
+    // Hämtar data från fil
 
     var reader;
     var progress = document.querySelector('.percent');
@@ -344,7 +352,8 @@
     }
 
     function handleFileSelection(evt) {
-        // Reset progress indicator on new file selection.
+        
+        // --- Uppdaeringar av statusen ----
         document.getElementById("statusCheck").innerHTML = "Loading file..."
 
         var output = document.getElementById("result");
@@ -352,6 +361,7 @@
         progress.textContent = '0%';
         var file = wsFile.files[0],
             reader = new FileReader();
+
         reader.onerror = errorHandler;
         reader.onprogress = updateProgress;
         reader.onabort = function (e) {
@@ -361,7 +371,7 @@
             document.getElementById('progress_bar').className = 'loading';
         };
         document.getElementById("statusCheck").innerHTML = "Reading file..."
-        reader.onload = function (event) {
+        reader.onload = function (event) { // när filen har laddats klart
 
             document.getElementById("statusCheck").innerHTML = "Inne i load"
 
@@ -375,12 +385,13 @@
             document.getElementById("statusCheck").innerHTML = "Almost done!"
 
 
+            // --- Fyller all information i ws_data ---
             allPackets = xmlDoc.getElementsByTagName('packet');
-
             var AmountPackets = 0
             var AmountFields = 0
             var AmountCstInfos = 0
-            Array.from(allPackets).forEach((packet, indexPacket) => {
+            var AmountRows = 0
+            Array.from(allPackets).forEach((packet, indexPacket) => { // Bläddrar igenom alla packet
                 AmountPackets += 1
                 allFields = packet.getElementsByTagName('field');
 
@@ -388,24 +399,25 @@
                 packetArrival = packet.getElementsByTagName('field')[3].getAttribute("show").replace(
                     'Västeuropa, normaltid', '');
 
-                Array.from(allFields).forEach((field, indexField) => {
+                Array.from(allFields).forEach((field, indexField) => { // Bläddrar igenom alla "fields"
                     AmountFields += 1
 
-                    if (field.getAttribute("name") == "http.file_data") {
+                    if (field.getAttribute("name") == "http.file_data") { // Om attributen är lik så finns info
                         allInfos = rawPacket(field.getAttribute("show"))
-                        Array.from(allInfos).forEach((infos, indexInfo) => {
-                            if (!CstLabelList.includes(CstLabel(infos))) {
+
+                        Array.from(allInfos).forEach((infos, indexInfo) => { // Bläddra igenom alla tåg
+                            if (!CstLabelList.includes(CstLabel(infos))) { // sparar vaeje tåg i en lista
                                 CstLabelList.push(CstLabel(infos))
                             }
 
 
                             CstLabelList.forEach((listItem, listIndex) => {
-                                if (CstLabel(infos) == listItem) {
+                                if (CstLabel(infos) == listItem) {          // sorterar info per tåg
 
-
-                                    ws_data[listIndex][ws_data[listIndex]
+                                    if (HasChanged(infos) == "true") { // sparar endast om förändring är sant
+                                        ws_data[listIndex][ws_data[listIndex] //sparar info i rätt fack
                                         .length
-                                    ] = [
+                                    ] = [           //funktioner för varje typ av info
                                             packetNumber,
                                             packetArrival,
                                             CstLabel(infos),
@@ -427,57 +439,62 @@
                                             LastUpdated(infos),
                                             MaxNumberOfStreams(infos),
                                         ]
+                                        
+                                        AmountRows += 1
+                                    }
                                 }
                             });
 
                             AmountCstInfos += 1
                         });
                     }
-
                 });
-
             });
-            console.log(ws_data)
-            console.log(CstLabelList)
-            CreateTable()
+            console.log("Paket: ", AmountPackets)
+            console.log("Consists: ", AmountCstInfos)
+            console.log("Rader: ", AmountRows)
+            // console.log(ws_data)
+            // console.log(CstLabelList)
+            CreateTable() // dags att skapa en tabell
 
             document.getElementById("statusCheck").innerHTML = "Done!"
-            progress.style.width = '100%';
+            progress.style.width = '100%'; // säkerställer att progress baren är 100% när allt är klart
             progress.textContent = '100%';
             setTimeout("document.getElementById('progress_bar').className='';", 2000);
         }
-        reader.readAsText(file);
-    }
-    wsFile.addEventListener('change', handleFileSelection, false);
-
-    // ------ save file --------------
-
-    function s2ab(s) {
-        var buf = new ArrayBuffer(s.length);
-        var view = new Uint8Array(buf);
-        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-        return buf;
-
+        reader.readAsText(file); // avslutar avläsningen av filen
     }
 
-    $("#button-save").click(function () {
-        var wb = XLSX.utils.book_new()
-        wb.SheetNames.push("Test Sheet")
-        //var ws_data = [];
-        var ws = XLSX.utils.aoa_to_sheet(ws_data)
-        wb.Sheets["Test Sheet"] = ws;
+    wsFile.addEventListener('change', handleFileSelection, false); // Bevakar om en fil valts
 
-        var wbout = XLSX.write(wb, {
-            bookType: 'xlsx',
-            type: 'binary'
-        })
+    // en icke-fungerande knapp för att spara tebellen som excel-fil (möjligtvis fungerade i framtiden)
 
-        console.log(ws_data)
-        saveAs(new Blob([s2ab(wbout)], {
-            type: "application/octet-stream"
-        }), 'test.xlsx');
-        console.log(ws_data)
-    });
+    // function s2ab(s) {
+    //     var buf = new ArrayBuffer(s.length);
+    //     var view = new Uint8Array(buf);
+    //     for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+    //     return buf;
+
+    // }
+
+    // $("#button-save").click(function () {
+    //     var wb = XLSX.utils.book_new()
+    //     wb.SheetNames.push("Test Sheet")
+    //     //var ws_data = [];
+    //     var ws = XLSX.utils.aoa_to_sheet(ws_data)
+    //     wb.Sheets["Test Sheet"] = ws;
+
+    //     var wbout = XLSX.write(wb, {
+    //         bookType: 'xlsx',
+    //         type: 'binary'
+    //     })
+
+    //     console.log(ws_data)
+    //     saveAs(new Blob([s2ab(wbout)], {
+    //         type: "application/octet-stream"
+    //     }), 'test.xlsx');
+    //     console.log(ws_data)
+    // });
 </script>
 
 </html>
